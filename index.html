@@ -12,7 +12,7 @@
     .header { background: rgba(255,255,255,0.95); border-radius: 20px; box-shadow: 0 15px 35px rgba(0,0,0,0.2); padding: 1.5rem; text-align: center; }
     .card { border: none; border-radius: 18px; transition: all 0.3s; background: white; }
     .card:hover { transform: translateY(-8px); box-shadow: 0 20px 40px rgba(0,0,0,0.2); }
-    .badge-cat { background: var(--primary); color: white; }
+    .badge-cat { background: var(--primary); color: white; font-weight: 600; }
     .ia-badge { background: var(--accent); color: white; font-size: 0.7em; border-radius: 50px; padding: 4px 10px; }
     .vook-logo { font-weight: 900; color: var(--primary); }
   </style>
@@ -29,19 +29,19 @@
       <!-- BÚSQUEDA -->
       <div class="col-md-5">
         <div class="input-group">
-          <input type="text" id="busqueda" class="form-control form-control-lg" placeholder="Ej: 'paneles solares en CDMX'" />
+          <input type="text" id="busqueda" class="form-control form-control-lg" placeholder="Ej: 'aire acondicionado en CDMX'" />
           <button class="btn btn-primary btn-lg" onclick="buscarConIA()"><i class="fas fa-search"></i></button>
           <button class="btn btn-outline-light btn-lg" onclick="voz()"><i class="fas fa-microphone"></i></button>
         </div>
       </div>
 
-      <!-- SECTOR: COMERCIAL / RESIDENCIAL -->
+      <!-- SECTOR -->
       <div class="col-md-2">
         <select class="form-select form-select-lg" id="sector" onchange="cambiarCategorias()">
           <option value="">Sector</option>
-          <option value="Residencial">Residencial</option>
           <option value="Comercial">Comercial</option>
-          </select>
+          <option value="Residencial">Residencial</option>
+        </select>
       </div>
 
       <!-- CATEGORÍA (DINÁMICA) -->
@@ -101,10 +101,18 @@
 
     let proveedores = [];
 
-    // CATEGORÍAS POR SECTOR
+    // CATEGORÍAS POR SECTOR (LAS QUE PEDISTE)
     const categorias = {
-      Comercial: ["Aire Acondicionado", "Alimentos", "Automatización", "Bienes Raices", "Construcción", "Energía", "Maquinaria", "Material de Limpieza", "Salud", "Seguridad", "Suministros", "Tecnología",  "Transporte"],
-      Residencial: ["Aire Acondicionado", "Alimentos", "Albañilería", "Bienes Raices" "Cocinas-Closets", "Construcción", "Electricidad", "Energía Solar", "Mudanzas", "Plomería", "Pintura", "Jardinería","Remodelación", "Seguridad"]
+      Comercial: [
+        "Aire Acondicionado", "Alimentos", "Automatización", "Bienes Raices",
+        "Construcción", "Energía", "Maquinaria", "Material de Limpieza",
+        "Salud", "Seguridad", "Suministros", "Tecnología", "Transporte"
+      ],
+      Residencial: [
+        "Aire Acondicionado", "Alimentos", "Albañilería", "Bienes Raices",
+        "Cocinas-Closets", "Construcción", "Electricidad", "Energía Solar",
+        "Mudanzas", "Plomería", "Pintura", "Jardinería", "Remodelación", "Seguridad"
+      ]
     };
 
     // CARGAR DATOS
@@ -131,7 +139,7 @@
       });
     }
 
-    // CAMBIAR CATEGORÍAS SEGÚN SECTOR
+    // CAMBIAR CATEGORÍAS
     function cambiarCategorias() {
       const sector = document.getElementById("sector").value;
       const catSelect = document.getElementById("categoria");
@@ -155,9 +163,12 @@
         <div class="col-md-6 col-lg-4 mb-4">
           <div class="card h-100 text-dark">
             <div class="card-body">
-              <h5>${p.Nombre}</h5>
-              <span class="badge badge-cat">${p.Categoría}</span>
-              <p><strong>${p.Estado}</strong><br>⭐ ${p['Rating (1-5)'] || 'N/A'}</p>
+              <h5 class="card-title">${p.Nombre}</h5>
+              <span class="badge badge-cat mb-2">${p.Categoría}</span>
+              <p class="card-text">
+                <strong>${p.Estado}</strong><br>
+                ⭐ ${p['Rating (1-5)'] || 'N/A'}
+              </p>
               <div class="d-flex gap-1">
                 ${p.Email ? `<a href="mailto:${p.Email}" class="btn btn-sm btn-outline-primary">Email</a>` : ''}
                 ${p.Teléfono ? `<a href="tel:${p.Teléfono}" class="btn btn-sm btn-success">Llamar</a>` : ''}
@@ -166,15 +177,6 @@
           </div>
         </div>
       `).join("") : "<div class='col-12 text-center text-white'>Sin resultados</div>";
-    }
-
-    // BÚSQUEDA
-    function buscarConIA() {
-      const q = document.getElementById("busqueda").value.toLowerCase().trim();
-      const filtrados = q ? proveedores.filter(p => 
-        JSON.stringify(Object.values(p)).toLowerCase().includes(q)
-      ) : proveedores;
-      aplicarFiltros(filtrados);
     }
 
     // FILTRAR
@@ -195,6 +197,15 @@
       mostrarProveedores(lista);
     }
 
+    // BÚSQUEDA
+    function buscarConIA() {
+      const q = document.getElementById("busqueda").value.toLowerCase().trim();
+      const filtrados = q ? proveedores.filter(p => 
+        JSON.stringify(Object.values(p)).toLowerCase().includes(q)
+      ) : proveedores;
+      aplicarFiltros(filtrados);
+    }
+
     // VOZ
     function voz() {
       const recognition = new (window.SpeechRecognition || window.webkitSpeechRecognition)();
@@ -211,6 +222,3 @@
   </script>
 </body>
 </html>
-
-
-
