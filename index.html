@@ -6,8 +6,6 @@
   <title>Provook México - Directorio IA</title>
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet"/>
   <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet"/>
-  <!-- LIBRERÍA PARA LEER EXCEL -->
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
   <style>
     :root { --primary: #1a73e8; --accent: #ff6b35; }
     body { background: linear-gradient(135deg, var(--primary) 0%, var(--accent) 100%); min-height: 100vh; color: #fff; }
@@ -17,7 +15,6 @@
     .badge-cat { background: var(--primary); color: white; }
     .ia-badge { background: var(--accent); color: white; font-size: 0.7em; border-radius: 50px; padding: 4px 10px; }
     .vook-logo { font-weight: 900; color: var(--primary); }
-    .loading { display: none; }
   </style>
 </head>
 <body>
@@ -27,15 +24,34 @@
       <p class="text-muted mb-0">Directorio de Proveedores en México</p>
     </div>
 
-    <!-- BÚSQUEDA + FILTROS -->
+    <!-- FILTROS -->
     <div class="row g-3 mb-4">
-      <div class="col-md-6">
+      <!-- BÚSQUEDA -->
+      <div class="col-md-5">
         <div class="input-group">
-          <input type="text" id="busqueda" class="form-control form-control-lg" placeholder="Ej: 'construcción en Jalisco'" />
+          <input type="text" id="busqueda" class="form-control form-control-lg" placeholder="Ej: 'paneles solares en CDMX'" />
           <button class="btn btn-primary btn-lg" onclick="buscarConIA()"><i class="fas fa-search"></i></button>
           <button class="btn btn-outline-light btn-lg" onclick="voz()"><i class="fas fa-microphone"></i></button>
         </div>
       </div>
+
+      <!-- SECTOR: COMERCIAL / RESIDENCIAL -->
+      <div class="col-md-2">
+        <select class="form-select form-select-lg" id="sector" onchange="cambiarCategorias()">
+          <option value="">Sector</option>
+          <option value="Comercial">Comercial</option>
+          <option value="Residencial">Residencial</option>
+        </select>
+      </div>
+
+      <!-- CATEGORÍA (DINÁMICA) -->
+      <div class="col-md-2">
+        <select class="form-select form-select-lg" id="categoria" onchange="filtrar()">
+          <option value="">Categoría</option>
+        </select>
+      </div>
+
+      <!-- ESTADO -->
       <div class="col-md-3">
         <select class="form-select form-select-lg" id="estado" onchange="filtrar()">
           <option value="">Todos los estados</option>
@@ -73,110 +89,53 @@
           <option value="Zacatecas">Zacatecas</option>
         </select>
       </div>
-      <div class="col-md-3">
-        <select class="form-select form-select-lg" id="categoria" onchange="filtrar()">
-          <option value="">Todas las categorías</option>
-          <option value="Construcción">Construcción</option>
-          <option value="Tecnología">Tecnología</option>
-          <option value="Alimentos">Alimentos</option>
-          <option value="Energía">Energía</option>
-          <option value="Salud">Salud</option>
-          <option value="Transporte">Transporte</option>
-        </select>
-      </div>
     </div>
 
     <!-- RESULTADOS -->
-    <div id="loading" class="text-center py-5">
-      <div class="spinner-border text-light" style="width: 3rem; height: 3rem;"></div>
-      <p>Cargando proveedores...</p>
-    </div>
     <div id="resultados" class="row"></div>
   </div>
 
   <script>
-    // === TU ENLACE DE EXCEL (ONEDRIVE) ===
-    // Sube tu archivo a OneDrive → Comparte → "Cualquier persona con el enlace"
-    // Ejemplo: https://1drv.ms/x/s!Aqq... 
-    const EXCEL_URL = "https://1drv.ms/x/s!Aqq..."; // ← PÉGALE TU ENLACE AQUÍ
+    // === TU GOOGLE SHEETS (CSV) ===
+    const SHEET_CSV_URL = "https://docs.google.com/spreadsheets/d/TU_ID_AQUI/export?format=csv";
 
     let proveedores = [];
 
-    // CARGAR DESDE EXCEL
-    async function cargarDesdeExcel() {
+    // CATEGORÍAS POR SECTOR
+    const categorias = {
+      Comercial: ["Construcción", "Tecnología", "Energía", "Transporte", "Alimentos", "Salud", "Maquinaria"],
+      Residencial: ["Remodelación", "Electricidad", "Plomería", "Pintura", "Jardinería", "Aire Acondicionado", "Seguridad"]
+    };
+
+    // CARGAR DATOS
+    async function cargarDatos() {
       try {
-        const res = await fetch(EXCEL_URL);
-        const blob = await res.blob();
-        const arrayBuffer = await blob.arrayBuffer();
-        const workbook = XLSX.read(arrayBuffer, { type: "array" });
-        const sheet = workbook.Sheets[workbook.SheetNames[0]];
-        proveedores = XLSX.utils.sheet_to_json(sheet);
+        const res = await fetch(SHEET_CSV_URL);
+        const text = await res.text();
+        proveedores = parseCSV(text);
         mostrarProveedores(proveedores);
-        document.getElementById("loading").style.display = "none";
       } catch (e) {
         document.getElementById("resultados").innerHTML = 
-          `<div class="col-12 text-center text-white"><h5>Error: Revisa el enlace de Excel</h5></div>`;
+          `<div class="col-12 text-center text-white"><h5>Error: Revisa el enlace de Google Sheets</h5></div>`;
       }
     }
 
-    // MOSTRAR PROVEEDORES
-    function mostrarProveedores(lista) {
-      const cont = document.getElementById("resultados");
-      if (lista.length === 0) {
-        cont.innerHTML = `<div class="col-12 text-center text-white"><h5>No se encontraron proveedores</h5></div>`;
-        return;
-      }
-      cont.innerHTML = lista.map(p => `
-        <div class="col-md-6 col-lg-4 mb-4">
-          <div class="card h-100 text-dark">
-            <div class="card-body">
-              <h5 class="card-title">${p.Nombre || 'Sin nombre'}</h5>
-              <span class="badge badge-cat mb-2">${p.Categoría}</span>
-              <p class="card-text">
-                <strong>${p.Estado}</strong><br>
-                ⭐ ${p['Rating (1-5)'] || 'N/A'}
-              </p>
-              <div class="d-flex gap-1">
-                ${p.Email ? `<a href="mailto:${p.Email}" class="btn btn-sm btn-outline-primary">Email</a>` : ''}
-                ${p.Teléfono ? `<a href="tel:${p.Teléfono}" class="btn btn-sm btn-success">Llamar</a>` : ''}
-              </div>
-            </div>
-          </div>
-        </div>
-      `).join("");
+    function parseCSV(text) {
+      const lines = text.trim().split("\n");
+      const headers = lines[0].split(",").map(h => h.trim());
+      return lines.slice(1).map(line => {
+        const values = line.split(",").map(v => v.trim().replace(/^"|"$/g, ''));
+        const obj = {};
+        headers.forEach((h, i) => obj[h] = values[i] || "");
+        return obj;
+      });
     }
 
-    // BÚSQUEDA CON IA LOCAL
-    function buscarConIA() {
-      const q = document.getElementById("busqueda").value.toLowerCase().trim();
-      if (!q) return mostrarProveedores(proveedores);
-      const filtrados = proveedores.filter(p => 
-        JSON.stringify(Object.values(p)).toLowerCase().includes(q)
-      );
-      mostrarProveedores(filtrados);
-    }
-
-    // FILTRAR POR ESTADO Y CATEGORÍA
-    function filtrar() {
-      const estado = document.getElementById("estado").value;
-      const categoria = document.getElementById("categoria").value;
-      let lista = proveedores;
-      if (estado) lista = lista.filter(p => p.Estado === estado);
-      if (categoria) lista = lista.filter(p => p.Categoría === categoria);
-      mostrarProveedores(lista);
-    }
-
-    // BÚSQUEDA POR VOZ
-    function voz() {
-      const recognition = new (window.SpeechRecognition || window.webkitSpeechRecognition)();
-      recognition.lang = 'es-MX';
-      recognition.start();
-      recognition.onresult = e => {
-        document.getElementById("busqueda").value = e.results[0][0].transcript;
-        buscarConIA();
-      };
-    }
-
-    // INICIAR
-    cargarDesdeExcel();
-  </script>
+    // CAMBIAR CATEGORÍAS SEGÚN SECTOR
+    function cambiarCategorias() {
+      const sector = document.getElementById("sector").value;
+      const catSelect = document.getElementById("categoria");
+      catSelect.innerHTML = '<option value="">Categoría</option>';
+      
+      if (sector && categorias[sector]) {
+        categorias
