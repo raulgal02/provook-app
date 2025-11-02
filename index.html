@@ -29,7 +29,7 @@
       <!-- BÚSQUEDA -->
       <div class="col-md-5">
         <div class="input-group">
-          <input type="text" id="busqueda" class="form-control form-control-lg" placeholder="Ej: 'mangueras en Monterrey'" />
+          <input type="text" id="busqueda" class="form-control form-control-lg" placeholder="Ej: 'aire acondicionado industrial en CDMX'" />
           <button class="btn btn-primary btn-lg" onclick="buscarConIA()"><i class="fas fa-search"></i></button>
           <button class="btn btn-outline-light btn-lg" onclick="voz()"><i class="fas fa-microphone"></i></button>
         </div>
@@ -101,26 +101,27 @@
 
     let proveedores = [];
 
-    // CATEGORÍAS POR SECTOR
+    // CATEGORÍAS POR SECTOR (INDUSTRIAL ACTUALIZADA)
     const categorias = {
       Industrial: [
-        "Aceites", "Aceros", "Alimentos", "Aluminio", "Automatización", "Birlos y tornillos",
-        "Cajas y material de empaque", "Chatarra", "Compresores y bombas", "Equipo de seguridad",
-        "Ferretería y herramientas", "Filtros", "Fletes", "Hules", "Llantas",
-        "Mangueras y conexiones", "Mantenimiento industrial", "Maquinados", "Material de limpieza",
-        "Material eléctrico", "Perfiles y Herrajes", "Quimicos", "Renta de maquinaria",
-        "Rodamientos", "Transporte"
+        "Aceites y filtros", "Aceros", "Aire acondicionado", "Alimentos", "Aluminio", "Automatización",
+        "Birlos y tornillos", "Cajas y material de empaque", "Chatarra", "Clínicas médicas",
+        "Compresores y bombas", "Energía", "Equipo de seguridad", "Ferretería y herramientas",
+        "Filtros", "Fletes", "Hules", "Llantas", "Mangueras y conexiones", "Mantenimiento industrial",
+        "Maquinados", "Material de limpieza", "Material eléctrico", "Perfiles y Herrajes",
+        "Quimicos", "Renta de maquinaria", "Rodamientos", "Seguridad y vigilancia", "Transporte de personal"
       ],
       Residencial: [
         "Agua purificada", "Aire acondicionado", "Alarmas, seguridad, vigilancia", "Albercas",
-        "Alimentos y banquetes", "Autolavado a domicilio", "Automatización", "Bicletas y motos",
+        "Alimentos y banquetes", "Autolavado a domicilio", "Automatización", "Bicicletas y motos",
         "Bienes Raices", "Bodas, fiestas y eventos", "Cantera, piedra y teja", "Carpintería, cocinas y closets",
-        "Cerrajeros", "Computación, telefonía, redes", "Construcción y ampliaciones", "Decoración, cortinas, duela, persianas",
-        "Disfraces", "Etiqueta", "Eléctricos", "Energía solar", "Enfermería y cuidado personal",
-        "Fletes y mudanzas", "Florería", "Herrería", "Idiomas", "Impermeabilizaciones", "Imprenta",
-        "Jardinería y riego", "Lavandería y tintorería", "Limpieza", "Maestros y asesorías",
-        "Malla ciclónica", "Mecánica autromotriz", "Pintores", "Plomeros", "Portones eléctricos",
-        "Préstamos", "Tablaroca", "Tapiceros", "Vestidos", "Vidrios y canceles", "Vulkanizadora, llantas", "Varios"
+        "Cerrajeros", "Colchones", "Computación, telefonía, redes", "Construcción y ampliaciones",
+        "Decoración, cortinas, duela, persianas", "Disfraces", "Etiqueta", "Eléctricos",
+        "Energía solar", "Enfermería y cuidado personal", "Fletes y mudanzas", "Florería",
+        "Herrería", "Idiomas", "Impermeabilizaciones", "Imprenta", "Jardinería y riego",
+        "Lavandería y tintorería", "Limpieza", "Maestros y asesorías", "Malla ciclónica",
+        "Mecánica automotriz", "Pintores", "Plomeros", "Portones eléctricos", "Préstamos",
+        "Tablaroca", "Tapiceros", "Vestidos", "Vidrios y canceles", "Vulkanizadora, llantas", "Varios"
       ]
     };
 
