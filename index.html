@@ -29,7 +29,7 @@
       <!-- BÚSQUEDA -->
       <div class="col-md-5">
         <div class="input-group">
-          <input type="text" id="busqueda" class="form-control form-control-lg" placeholder="Ej: 'aire acondicionado en CDMX'" />
+          <input type="text" id="busqueda" class="form-control form-control-lg" placeholder="Ej: 'mangueras en Monterrey'" />
           <button class="btn btn-primary btn-lg" onclick="buscarConIA()"><i class="fas fa-search"></i></button>
           <button class="btn btn-outline-light btn-lg" onclick="voz()"><i class="fas fa-microphone"></i></button>
         </div>
@@ -39,12 +39,12 @@
       <div class="col-md-2">
         <select class="form-select form-select-lg" id="sector" onchange="cambiarCategorias()">
           <option value="">Sector</option>
+          <option value="Industrial">Industrial</option>
           <option value="Residencial">Residencial</option>
-          <option value="Comercial">Comercial</option>
         </select>
       </div>
 
-      <!-- CATEGORÍA (DINÁMICA) -->
+      <!-- CATEGORÍA -->
       <div class="col-md-2">
         <select class="form-select form-select-lg" id="categoria" onchange="filtrar()">
           <option value="">Categoría</option>
@@ -101,19 +101,45 @@
 
     let proveedores = [];
 
-    // CATEGORÍAS POR SECTOR (LAS QUE PEDISTE)
+    // CATEGORÍAS POR SECTOR
     const categorias = {
-      Comercial: [
-        "Aire Acondicionado", "Alimentos", "Automatización", "Bienes Raices",
-        "Construcción", "Energía", "Maquinaria", "Material de Limpieza",
-        "Salud", "Seguridad", "Suministros", "Tecnología", "Transporte"
+      Industrial: [
+        "Aceites", "Aceros", "Alimentos", "Aluminio", "Automatización", "Birlos y tornillos",
+        "Cajas y material de empaque", "Chatarra", "Compresores y bombas", "Equipo de seguridad",
+        "Ferretería y herramientas", "Filtros", "Fletes", "Hules", "Llantas",
+        "Mangueras y conexiones", "Mantenimiento industrial", "Maquinados", "Material de limpieza",
+        "Material eléctrico", "Perfiles y Herrajes", "Quimicos", "Renta de maquinaria",
+        "Rodamientos", "Transporte"
       ],
       Residencial: [
-        "Aire Acondicionado", "Alimentos", "Albañilería", "Bienes Raices",
-        "Cocinas-Closets", "Construcción", "Electricidad", "Energía Solar",
-        "Mudanzas", "Plomería", "Pintura", "Jardinería", "Remodelación", "Seguridad"
+        "Agua purificada", "Aire acondicionado", "Alarmas, seguridad, vigilancia", "Albercas",
+        "Alimentos y banquetes", "Autolavado a domicilio", "Automatización", "Bicletas y motos",
+        "Bienes Raices", "Bodas, fiestas y eventos", "Cantera, piedra y teja", "Carpintería, cocinas y closets",
+        "Cerrajeros", "Computación, telefonía, redes", "Construcción y ampliaciones", "Decoración, cortinas, duela, persianas",
+        "Disfraces", "Etiqueta", "Eléctricos", "Energía solar", "Enfermería y cuidado personal",
+        "Fletes y mudanzas", "Florería", "Herrería", "Idiomas", "Impermeabilizaciones", "Imprenta",
+        "Jardinería y riego", "Lavandería y tintorería", "Limpieza", "Maestros y asesorías",
+        "Malla ciclónica", "Mecánica autromotriz", "Pintores", "Plomeros", "Portones eléctricos",
+        "Préstamos", "Tablaroca", "Tapiceros", "Vestidos", "Vidrios y canceles", "Vulkanizadora, llantas", "Varios"
       ]
     };
+
+    // CAMBIAR CATEGORÍAS AL CAMBIAR SECTOR
+    function cambiarCategorias() {
+      const sector = document.getElementById("sector").value;
+      const catSelect = document.getElementById("categoria");
+      catSelect.innerHTML = '<option value="">Categoría</option>';
+
+      if (sector && categorias[sector]) {
+        categorias[sector].forEach(cat => {
+          const opt = document.createElement("option");
+          opt.value = cat;
+          opt.textContent = cat;
+          catSelect.appendChild(opt);
+        });
+      }
+      filtrar();
+    }
 
     // CARGAR DATOS
     async function cargarDatos() {
@@ -139,23 +165,6 @@
       });
     }
 
-    // CAMBIAR CATEGORÍAS
-    function cambiarCategorias() {
-      const sector = document.getElementById("sector").value;
-      const catSelect = document.getElementById("categoria");
-      catSelect.innerHTML = '<option value="">Categoría</option>';
-      
-      if (sector && categorias[sector]) {
-        categorias[sector].forEach(cat => {
-          const opt = document.createElement("option");
-          opt.value = cat;
-          opt.textContent = cat;
-          catSelect.appendChild(opt);
-        });
-      }
-      filtrar();
-    }
-
     // MOSTRAR PROVEEDORES
     function mostrarProveedores(lista) {
       const cont = document.getElementById("resultados");
@@ -179,11 +188,7 @@
       `).join("") : "<div class='col-12 text-center text-white'>Sin resultados</div>";
     }
 
-    // FILTRAR
-    function filtrar() {
-      aplicarFiltros(proveedores);
-    }
-
+    // APLICAR FILTROS
     function aplicarFiltros(listaBase) {
       const sector = document.getElementById("sector").value;
       const categoria = document.getElementById("categoria").value;
@@ -206,6 +211,11 @@
       aplicarFiltros(filtrados);
     }
 
+    // FILTRAR GENERAL
+    function filtrar() {
+      aplicarFiltros(proveedores);
+    }
+
     // VOZ
     function voz() {
       const recognition = new (window.SpeechRecognition || window.webkitSpeechRecognition)();
@@ -222,4 +232,3 @@
   </script>
 </body>
 </html>
-
