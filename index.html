@@ -138,4 +138,76 @@
       catSelect.innerHTML = '<option value="">Categoría</option>';
       
       if (sector && categorias[sector]) {
-        categorias
+        categorias[sector].forEach(cat => {
+          const opt = document.createElement("option");
+          opt.value = cat;
+          opt.textContent = cat;
+          catSelect.appendChild(opt);
+        });
+      }
+      filtrar();
+    }
+
+    // MOSTRAR PROVEEDORES
+    function mostrarProveedores(lista) {
+      const cont = document.getElementById("resultados");
+      cont.innerHTML = lista.length ? lista.map(p => `
+        <div class="col-md-6 col-lg-4 mb-4">
+          <div class="card h-100 text-dark">
+            <div class="card-body">
+              <h5>${p.Nombre}</h5>
+              <span class="badge badge-cat">${p.Categoría}</span>
+              <p><strong>${p.Estado}</strong><br>⭐ ${p['Rating (1-5)'] || 'N/A'}</p>
+              <div class="d-flex gap-1">
+                ${p.Email ? `<a href="mailto:${p.Email}" class="btn btn-sm btn-outline-primary">Email</a>` : ''}
+                ${p.Teléfono ? `<a href="tel:${p.Teléfono}" class="btn btn-sm btn-success">Llamar</a>` : ''}
+              </div>
+            </div>
+          </div>
+        </div>
+      `).join("") : "<div class='col-12 text-center text-white'>Sin resultados</div>";
+    }
+
+    // BÚSQUEDA
+    function buscarConIA() {
+      const q = document.getElementById("busqueda").value.toLowerCase().trim();
+      const filtrados = q ? proveedores.filter(p => 
+        JSON.stringify(Object.values(p)).toLowerCase().includes(q)
+      ) : proveedores;
+      aplicarFiltros(filtrados);
+    }
+
+    // FILTRAR
+    function filtrar() {
+      aplicarFiltros(proveedores);
+    }
+
+    function aplicarFiltros(listaBase) {
+      const sector = document.getElementById("sector").value;
+      const categoria = document.getElementById("categoria").value;
+      const estado = document.getElementById("estado").value;
+
+      let lista = listaBase;
+      if (sector) lista = lista.filter(p => p.Sector === sector);
+      if (categoria) lista = lista.filter(p => p.Categoría === categoria);
+      if (estado) lista = lista.filter(p => p.Estado === estado);
+
+      mostrarProveedores(lista);
+    }
+
+    // VOZ
+    function voz() {
+      const recognition = new (window.SpeechRecognition || window.webkitSpeechRecognition)();
+      recognition.lang = 'es-MX';
+      recognition.start();
+      recognition.onresult = e => {
+        document.getElementById("busqueda").value = e.results[0][0].transcript;
+        buscarConIA();
+      };
+    }
+
+    // INICIAR
+    cargarDatos();
+  </script>
+</body>
+</html>
