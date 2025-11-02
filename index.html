@@ -39,8 +39,8 @@
       <div class="col-md-2">
         <select class="form-select form-select-lg" id="sector" onchange="cambiarCategorias()">
           <option value="">Sector</option>
-          <option value="Residencial">Residencial</option>
           <option value="Comercial">Comercial</option>
+          <option value="Residencial">Residencial</option>
         </select>
       </div>
 
@@ -103,8 +103,8 @@
 
     // CATEGORÍAS POR SECTOR
     const categorias = {
-      Residencial: ["Albañilería",  "Aire Acondicionado", "Alimentos", "Construcción", "Remodelaciones", "Carpintería", "Electricidad", "Energía Solar", "Herrería", "Plomería", "Pintura" "Mudanzas", "Jardinería", "Seguridad"],
-      Comercial: ["Aire Acondicionado", "Alimentos",  "Automatización", "Construcción",  "Energía", "Transporte", "Maquinaria", "Mantenimiento industrial", "Salud","Tecnología" ]
+      Comercial: ["Construcción", "Tecnología", "Energía", "Transporte", "Alimentos", "Salud", "Maquinaria"],
+      Residencial: ["Remodelación", "Electricidad", "Plomería", "Pintura", "Jardinería", "Aire Acondicionado", "Seguridad"]
     };
 
     // CARGAR DATOS
@@ -211,5 +211,3 @@
   </script>
 </body>
 </html>
-
-
