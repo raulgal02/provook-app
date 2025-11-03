@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Provook México - Directorio IA</title>
+  <title>Provook México - Técnicos</title>
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet"/>
   <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet"/>
   <style>
@@ -21,33 +21,37 @@
   <div class="container py-5">
     <div class="header mb-4">
       <h1 class="vook-logo"><i class="fas fa-microphone"></i> Provook <span class="ia-badge">IA</span></h1>
-      <p class="text-muted mb-0">Directorio de Proveedores en México</p>
+      <p class="text-muted mb-0">Directorio de Técnicos en México</p>
     </div>
 
     <!-- FILTROS -->
     <div class="row g-3 mb-4">
       <!-- BÚSQUEDA -->
-      <div class="col-md-5">
+      <div class="col-md-6">
         <div class="input-group">
-          <input type="text" id="busqueda" class="form-control form-control-lg" placeholder="Ej: 'aire acondicionado industrial en CDMX'" />
+          <input type="text" id="busqueda" class="form-control form-control-lg" placeholder="Ej: 'plomero en CDMX'" />
           <button class="btn btn-primary btn-lg" onclick="buscarConIA()"><i class="fas fa-search"></i></button>
           <button class="btn btn-outline-light btn-lg" onclick="voz()"><i class="fas fa-microphone"></i></button>
         </div>
       </div>
 
-      <!-- SECTOR -->
-      <div class="col-md-2">
-        <select class="form-select form-select-lg" id="sector" onchange="cambiarCategorias()">
-          <option value="">Sector</option>
-          <option value="Industrial">Industrial</option>
-          <option value="Residencial">Residencial</option>
-        </select>
-      </div>
-
-      <!-- CATEGORÍA -->
-      <div class="col-md-2">
-        <select class="form-select form-select-lg" id="categoria" onchange="filtrar()">
-          <option value="">Categoría</option>
+      <!-- TÉCNICOS -->
+      <div class="col-md-3">
+        <select class="form-select form-select-lg" id="tecnico" onchange="filtrar()">
+          <option value="">Todos los Técnicos</option>
+          <option value="Albañiles">Albañiles</option>
+          <option value="Arquitectos">Arquitectos</option>
+          <option value="Automotriz">Automotriz</option>
+          <option value="Carpinteros">Carpinteros</option>
+          <option value="Cerrajeros">Cerrajeros</option>
+          <option value="Eléctricos">Eléctricos</option>
+          <option value="Herreros">Herreros</option>
+          <option value="Ingenieros">Ingenieros</option>
+          <option value="Jardineros">Jardineros</option>
+          <option value="Maestros">Maestros</option>
+          <option value="Pintores">Pintores</option>
+          <option value="Plomeros">Plomeros</option>
+          <option value="Tecnología">Tecnología</option>
         </select>
       </div>
 
@@ -101,47 +105,6 @@
 
     let proveedores = [];
 
-    // CATEGORÍAS POR SECTOR (INDUSTRIAL ACTUALIZADA)
-    const categorias = {
-      Industrial: [
-        "Aceites y filtros", "Aceros", "Aire acondicionado", "Alimentos", "Aluminio", "Automatización",
-        "Birlos y tornillos", "Cajas y material de empaque", "Chatarra", "Clínicas médicas",
-        "Compresores y bombas", "Energía", "Equipo de seguridad", "Ferretería y herramientas",
-        "Filtros", "Fletes", "Hules", "Llantas", "Mangueras y conexiones", "Mantenimiento industrial",
-        "Maquinados", "Material de limpieza", "Material eléctrico", "Perfiles y Herrajes",
-        "Quimicos", "Renta de maquinaria", "Rodamientos", "Seguridad y vigilancia", "Transporte de personal"
-      ],
-      Residencial: [
-        "Agua purificada", "Aire acondicionado", "Alarmas, seguridad, vigilancia", "Albercas",
-        "Alimentos y banquetes", "Autolavado a domicilio", "Automatización", "Bicicletas y motos",
-        "Bienes Raices", "Bodas, fiestas y eventos", "Cantera, piedra y teja", "Carpintería, cocinas y closets",
-        "Cerrajeros", "Colchones", "Computación, telefonía, redes", "Construcción y ampliaciones",
-        "Decoración, cortinas, duela, persianas", "Disfraces", "Etiqueta", "Eléctricos",
-        "Energía solar", "Enfermería y cuidado personal", "Fletes y mudanzas", "Florería",
-        "Herrería", "Idiomas", "Impermeabilizaciones", "Imprenta", "Jardinería y riego",
-        "Lavandería y tintorería", "Limpieza", "Maestros y asesorías", "Malla ciclónica",
-        "Mecánica automotriz", "Pintores", "Plomeros", "Portones eléctricos", "Préstamos",
-        "Tablaroca", "Tapiceros", "Vestidos", "Vidrios y canceles", "Vulkanizadora, llantas", "Varios"
-      ]
-    };
-
-    // CAMBIAR CATEGORÍAS AL CAMBIAR SECTOR
-    function cambiarCategorias() {
-      const sector = document.getElementById("sector").value;
-      const catSelect = document.getElementById("categoria");
-      catSelect.innerHTML = '<option value="">Categoría</option>';
-
-      if (sector && categorias[sector]) {
-        categorias[sector].forEach(cat => {
-          const opt = document.createElement("option");
-          opt.value = cat;
-          opt.textContent = cat;
-          catSelect.appendChild(opt);
-        });
-      }
-      filtrar();
-    }
-
     // CARGAR DATOS
     async function cargarDatos() {
       try {
@@ -191,13 +154,11 @@
 
     // APLICAR FILTROS
     function aplicarFiltros(listaBase) {
-      const sector = document.getElementById("sector").value;
-      const categoria = document.getElementById("categoria").value;
+      const tecnico = document.getElementById("tecnico").value;
       const estado = document.getElementById("estado").value;
 
       let lista = listaBase;
-      if (sector) lista = lista.filter(p => p.Sector === sector);
-      if (categoria) lista = lista.filter(p => p.Categoría === categoria);
+      if (tecnico) lista = lista.filter(p => p.Categoría === tecnico);
       if (estado) lista = lista.filter(p => p.Estado === estado);
 
       mostrarProveedores(lista);
